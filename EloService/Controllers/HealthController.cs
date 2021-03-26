@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace EloService.Controllers
 {
+    [Produces("application/json")]
+    [Route("api/Health")]
     public class HealthController : Controller
     {
         public IActionResult Index()

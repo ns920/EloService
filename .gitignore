@@ -133,3 +133,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
+
+#eloService
+EloService/appsettings.json

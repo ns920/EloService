@@ -55,7 +55,6 @@ namespace EloService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
             // register this service
             ServiceEntity serviceEntity = new ServiceEntity
             {
