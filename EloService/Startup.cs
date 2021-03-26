@@ -58,7 +58,7 @@ namespace EloService
             // register this service
             ServiceEntity serviceEntity = new ServiceEntity
             {
-                IP = NetworkHelper.GetLocalIP(),
+                IP = Configuration["Service:IP"],
                 Port = Convert.ToInt32(Configuration["Service:Port"]),
                 ServiceName = Configuration["Service:Name"],
                 ConsulIP = Configuration["Consul:IP"],
