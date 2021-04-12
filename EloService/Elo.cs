@@ -7,7 +7,7 @@ namespace EloService
 {
     public class Elo
     {
-        public string elo { get; set; }
+        public int elo { get; set; }
         public int uid { get; set; }
     }
 }

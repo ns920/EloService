@@ -21,19 +21,48 @@ namespace EloService.Controllers
 
         [Route("api/Elo/Calculate")]
         [HttpPost]
-        public IActionResult Calculate(string elo,string matchentity)
+        public IActionResult Calculate(string elo, string matchentity)
         {
             try
             {
                 var match = JsonConvert.DeserializeObject<MatchEntity>(matchentity);
                 dynamic elosObject = JObject.Parse(elo);
                 Elo[] elos = elosObject.elos.ToObject<Elo[]>();
+                //转换为字典
+                SortedDictionary<int, int> eloDictionary = new();
+                foreach(var _elo in elos)
+                {
+                    eloDictionary.Add(_elo.uid, _elo.elo);
+                }
                 //elo计算逻辑
+                foreach (var _event in match.events)
+                {
+                    SortedDictionary<int, int> scores = new();//uid,scores
+                    //抓取每个玩家的单局分数
+                    foreach(var score in _event.game.scores)
+                    {
+                        scores.Add(score.user_id, score.score);
+                    }
+                    int[] scoresArray=scores.Values.ToArray();
+                    //获取每个人的rank
+                    int[] RScores = new int[elos.Length];
+                    for(int i=0;i<scoresArray.Length;i++)
+                    {
+                        RScores[i] = eloDictionary.Where(x => x.Key == scores.ToArray()[i].Key).Select(x => x.Value).First();
+                    }
+                    SingleMatch(scoresArray, ref RScores);
+                    //将rank回写字典
+                    int[] uids = scores.Keys.ToArray();
+                    for(int i=0;i<uids.Length;i++)
+                    {
+                        eloDictionary[uids[i]] = RScores[i];
+                    }
 
-                Elo[] newElos = elos;
+                }
+                //Elo[] newElos = elos;
                 var context = new
                 {
-                    elos=newElos,
+                    elos = eloDictionary.ToArray(),
                     message = "Success"
                 };
                 return Json(context);
@@ -42,7 +71,7 @@ namespace EloService.Controllers
             {
                 var context = new
                 {
-                    message = "Error:"+ex.Message,
+                    message = "Error:" + ex.Message,
                 };
                 return Json(context);
             }
@@ -52,7 +81,7 @@ namespace EloService.Controllers
         /// </summary>
         /// <param name="scores"></param>
         /// <param name="RScores"></param>
-        void SingleMatch(int[] scores,ref int[] RScores)
+        void SingleMatch(int[] scores, ref int[] RScores)
         {
             double k = 40;
             //计算平均分
@@ -60,9 +89,9 @@ namespace EloService.Controllers
             double scoreAvg = scores.Average();
             double[] EScores = new double[scores.Length];
 
-            for(int i=0;i< scores.Length;i++)
+            for (int i = 0; i < scores.Length; i++)
             {
-                EScores[i]= 1 / (1 + Math.Pow(10, (rateAvg - RScores[i]) / 2000));
+                EScores[i] = 1 / (1 + Math.Pow(10, (rateAvg - RScores[i]) / 2000));
             }
 
             double[] SScores = new double[scores.Length];
@@ -83,7 +112,7 @@ namespace EloService.Controllers
             int[] delta = new int[scores.Length];
             for (int i = 0; i < scores.Length; i++)
             {
-                delta[i]= (int)Math.Round(k * (SScores[i] - EScores[i]));
+                delta[i] = (int)Math.Round(k * (SScores[i] - EScores[i]));
             }
 
             //最终得分修改
@@ -98,7 +127,7 @@ namespace EloService.Controllers
         /// <param name="score"></param>
         /// <param name="scoreAvg">平均分</param>
         /// <returns></returns>
-        double ScoreRatio(int score,double scoreAvg)
+        double ScoreRatio(int score, double scoreAvg)
         {
             double ratio = score / scoreAvg;
             if (ratio > 5) return 1;
