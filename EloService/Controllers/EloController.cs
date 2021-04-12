@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,41 +18,22 @@ namespace EloService.Controllers
             return View();
         }
 
+
         [Route("api/Elo/Calculate")]
         [HttpPost]
-        public IActionResult Calculate(int elo1, int elo2)
-        {
-            try
-            {
-                var context = new
-                {
-                    elo1 = elo1,
-                    elo2 = elo2,
-                    message = "Success"
-                };
-                return Json(context);
-            }
-            catch (System.Exception ex)
-            {
-                var context = new
-                {
-                    message = "Error",
-                };
-                return Json(context);
-            }
-        }
-
-        [Route("api/Elo/Calculate2")]
-        [HttpPost]
-        public IActionResult Calculate2(string elo1,string elo2,string matchentity)
+        public IActionResult Calculate(string elo,string matchentity)
         {
             try
             {
                 var match = JsonConvert.DeserializeObject<MatchEntity>(matchentity);
+                dynamic elosObject = JObject.Parse(elo);
+                Elo[] elos = elosObject.elos.ToObject<Elo[]>();
+                //elo计算逻辑
+
+                Elo[] newElos = elos;
                 var context = new
                 {
-                    elo1 = match.users[0].id,
-                    elo2 = match.users[1].id,
+                    elos=newElos,
                     message = "Success"
                 };
                 return Json(context);
@@ -60,7 +42,7 @@ namespace EloService.Controllers
             {
                 var context = new
                 {
-                    message = "Error",
+                    message = "Error:"+ex.Message,
                 };
                 return Json(context);
             }
