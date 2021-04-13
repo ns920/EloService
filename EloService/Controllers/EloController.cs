@@ -37,6 +37,8 @@ namespace EloService.Controllers
                 //elo计算逻辑
                 foreach (var _event in match.events)
                 {
+                    if (_event.game == null) continue;
+                    if (_event.game.scores.Length == 0) continue;
                     SortedDictionary<int, int> scores = new();//uid,scores
                     //抓取每个玩家的单局分数
                     foreach(var score in _event.game.scores)
