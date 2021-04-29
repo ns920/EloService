@@ -43,11 +43,13 @@ namespace EloService.Controllers
                     //抓取每个玩家的单局分数
                     foreach(var score in _event.game.scores)
                     {
+                        //剔除不存在rank的人
+                        if(eloDictionary.Where(x=>x.Key==score.user_id).Count()>0)
                         scores.Add(score.user_id, score.score);
                     }
                     int[] scoresArray=scores.Values.ToArray();
                     //获取每个人的rank
-                    int[] RScores = new int[elos.Length];
+                    int[] RScores = new int[scoresArray.Length];
                     for(int i=0;i<scoresArray.Length;i++)
                     {
                         RScores[i] = eloDictionary.Where(x => x.Key == scores.ToArray()[i].Key).Select(x => x.Value).First();
