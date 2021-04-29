@@ -99,13 +99,10 @@ namespace EloService.Controllers
             }
 
             double[] SScores = new double[scores.Length];
-            double per = 1 / (scores.Length - 1);//每超过一个人的分数
+            double per = 1d / (scores.Length - 1);//每超过一个人的分数
             for (int i = 0; i < scores.Length; i++)//每个人
             {
-                for (int j = 0; j < scores.Length; j++)//循环数组判断超过的人数
-                {
-                    if (scores[i] > scores[j]) SScores[i] += per;
-                }
+                SScores[i] = (scores.Where(x => x <= scores[i]).Count()-1)*per;
             }
 
             for (int i = 0; i < scores.Length; i++)
