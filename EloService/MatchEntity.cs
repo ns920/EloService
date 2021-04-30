@@ -21,8 +21,8 @@ namespace EloService
         public class Match
         {
             public int id { get; set; }
-            public DateTime start_time { get; set; }
-            public DateTime end_time { get; set; }
+            public DateTime? start_time { get; set; }
+            public DateTime? end_time { get; set; }
             public string name { get; set; }
         }
 
@@ -30,7 +30,7 @@ namespace EloService
         {
             public int id { get; set; }
             public Detail detail { get; set; }
-            public DateTime timestamp { get; set; }
+            public DateTime? timestamp { get; set; }
             public int? user_id { get; set; }
             public Game game { get; set; }
         }
@@ -44,7 +44,7 @@ namespace EloService
         public class Game
         {
             public int id { get; set; }
-            public DateTime start_time { get; set; }
+            public DateTime? start_time { get; set; }
             public DateTime? end_time { get; set; }
             public string mode { get; set; }
             public int mode_int { get; set; }
